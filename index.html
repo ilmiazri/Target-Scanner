@@ -6,32 +6,36 @@
   <title>Login - Target Scanner</title>
   <style>
     body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: #111;
+      background: #000;
       color: #fff;
-      font-family: sans-serif;
+      display: flex;
       flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: sans-serif;
     }
     input, button {
-      margin: 10px;
       padding: 10px;
+      margin: 10px;
       font-size: 16px;
     }
     button {
-      background: #007bff;
+      background-color: #007bff;
       color: white;
       border: none;
       border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
     }
   </style>
 </head>
 <body>
   <h2>Log Masuk</h2>
-  <input type="text" id="ic" placeholder="No IC">
-  <input type="password" id="password" placeholder="Katalaluan">
+  <input type="text" id="ic" placeholder="Masukkan No IC" />
+  <input type="password" id="password" placeholder="Katalaluan" />
   <button onclick="login()">Log Masuk</button>
 
   <script>
@@ -39,11 +43,11 @@
       const ic = document.getElementById("ic").value;
       const pw = document.getElementById("password").value;
 
-      // Anda boleh tukar nilai sebenar ini
-      if (ic === "123456789012" && pw === "password") {
+      // Tukar kepada maklumat sebenar anda
+      if (ic === "123456789012" && pw === "abc123") {
         window.location.href = "scanner.html";
       } else {
-        alert("Log masuk gagal!");
+        alert("Log masuk gagal. Sila cuba lagi.");
       }
     }
   </script>
