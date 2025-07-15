@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daftar Akaun Baharu</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: sans-serif;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <h2>Daftar Akaun Baharu</h2>
+  <input type="text" id="nama" placeholder="Nama Penuh" />
+  <input type="text" id="ic" placeholder="No IC" />
+  <input type="text" id="telefon" placeholder="No Telefon" />
+  <input type="password" id="password" placeholder="Katalaluan" />
+  <button onclick="daftar()">Daftar</button>
+  <button onclick="window.location.href='index.html'">Kembali ke Log Masuk</button>
+
+  <script>
+    function daftar() {
+      const nama = document.getElementById("nama").value;
+      const ic = document.getElementById("ic").value;
+      const telefon = document.getElementById("telefon").value;
+      const password = document.getElementById("password").value;
+
+      if (!nama || !ic || !telefon || !password) {
+        alert("Sila lengkapkan semua maklumat.");
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem("users")) || [];
+      const exists = users.find(u => u.ic === ic);
+      if (exists) {
+        alert("Pengguna dengan No IC ini sudah wujud.");
+        return;
+      }
+
+      users.push({ nama, ic, telefon, password });
+      localStorage.setItem("users", JSON.stringify(users));
+      alert("Pendaftaran berjaya! Sila log masuk.");
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
