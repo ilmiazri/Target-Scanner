@@ -3,92 +3,166 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - Target Scanner</title>
+  <title>Target Scanner</title>
   <style>
     body {
-      font-family: sans-serif;
       margin: 0;
-      padding: 0;
-      background: #f1f1f1;
+      font-family: sans-serif;
+      background: #000;
+      color: #fff;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       height: 100vh;
+      overflow: hidden;
     }
-    .login-container {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
-      width: 300px;
+    #videoWrapper {
+      position: relative;
+      width: 85vw;
+      max-width: 600px;
+      height: 85vw;
+      max-height: 600px;
+      margin-top: 20px;
     }
-    .login-container h2 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    input[type="text"], input[type="password"] {
+    video {
       width: 100%;
-      padding: 10px;
-      margin: 10px 0;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+      height: 100%;
+      border-radius: 10px;
+    }
+    #scanFrame {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 5px dashed white;
+      border-radius: 10px;
+      display: none;
+      pointer-events: none;
     }
     button {
-      width: 100%;
-      padding: 10px;
-      background: #007bff;
-      border: none;
-      color: white;
-      border-radius: 5px;
+      margin: 15px;
+      padding: 10px 20px;
       font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      background: #007bff;
+      color: white;
       cursor: pointer;
     }
     button:hover {
       background: #0056b3;
     }
-    .error {
-      color: red;
-      font-size: 14px;
+    table {
+      width: 90%;
+      margin-top: 20px;
+      border-collapse: collapse;
+      background: #222;
+    }
+    table, th, td {
+      border: 1px solid #555;
+    }
+    th, td {
+      padding: 8px;
       text-align: center;
+    }
+    #scorePopup {
+      position: absolute;
+      top: 10px;
+      background: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
       display: none;
-      margin-top: 10px;
+      font-size: 24px;
     }
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <h2>Login</h2>
-    <input type="text" id="ic" placeholder="No IC">
-    <input type="password" id="password" placeholder="Kata Laluan">
-    <button onclick="login()">Log Masuk</button>
-    <div id="loginError" class="error">IC atau kata laluan salah</div>
+  <h2>Target Scanner</h2>
+  <div id="videoWrapper">
+    <video id="video" autoplay playsinline></video>
+    <div id="scanFrame"></div>
+    <div id="scorePopup">Markah: 10</div>
   </div>
+  <button id="scanBtn">Scan</button>
+  <button id="resetBtn">Reset</button>
+  <table id="scoreTable">
+    <tr><th>Bil</th><th>Markah</th></tr>
+  </table>
 
   <script>
-    const defaultUsers = [
-      { ic: "900101014321", password: "1234" },
-      { ic: "800202028765", password: "abcd" }
-    ];
+    let scanning = false;
+    const scanBtn = document.getElementById("scanBtn");
+    const video = document.getElementById("video");
+    const scanFrame = document.getElementById("scanFrame");
+    const scoreTable = document.getElementById("scoreTable");
+    const scorePopup = document.getElementById("scorePopup");
+    const resetBtn = document.getElementById("resetBtn");
 
-    // If no users stored, store default
-    if (!localStorage.getItem("scannerUsers")) {
-      localStorage.setItem("scannerUsers", JSON.stringify(defaultUsers));
-    }
+    let scores = [];
 
-    function login() {
-      const ic = document.getElementById('ic').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const error = document.getElementById('loginError');
-      const users = JSON.parse(localStorage.getItem("scannerUsers"));
-
-      const user = users.find(u => u.ic === ic && u.password === password);
-      if (user) {
-        localStorage.setItem("loggedInUser", JSON.stringify(user));
-        window.location.href = "scanner.html";
+    async function toggleCamera() {
+      if (scanning) {
+        stopCamera();
+        scanFrame.style.display = "none";
+        scanBtn.textContent = "Scan";
+        scanning = false;
       } else {
-        error.style.display = 'block';
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+          video.srcObject = stream;
+          scanFrame.style.display = "block";
+          scanBtn.textContent = "Stop";
+          scanning = true;
+          detectScore();
+        } catch (err) {
+          alert("Camera not available");
+        }
       }
     }
+
+    function stopCamera() {
+      const stream = video.srcObject;
+      if (stream) {
+        const tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
+        video.srcObject = null;
+      }
+    }
+
+    function detectScore() {
+      // Simulasi pengesanan markah
+      setTimeout(() => {
+        if (scanning) {
+          const score = Math.floor(Math.random() * 11); // markah rawak 0–10
+          scores.push(score);
+          showScorePopup(score);
+          updateTable();
+          detectScore();
+        }
+      }, 3000);
+    }
+
+    function showScorePopup(score) {
+      scorePopup.textContent = `Markah: ${score}`;
+      scorePopup.style.display = "block";
+      setTimeout(() => {
+        scorePopup.style.display = "none";
+      }, 2000);
+    }
+
+    function updateTable() {
+      const rows = scores.map((s, i) => `<tr><td>${i + 1}</td><td>${s}</td></tr>`).join("");
+      scoreTable.innerHTML = `<tr><th>Bil</th><th>Markah</th></tr>${rows}`;
+    }
+
+    scanBtn.addEventListener("click", toggleCamera);
+    resetBtn.addEventListener("click", () => {
+      scores = [];
+      updateTable();
+    });
   </script>
 </body>
 </html>
