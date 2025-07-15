@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daftar Akaun Baharu</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Daftar Akaun Baru</title>
   <style>
     body {
       background: #000;
@@ -33,36 +33,37 @@
   </style>
 </head>
 <body>
-  <h2>Daftar Akaun Baharu</h2>
+  <h2>Daftar Akaun Baru</h2>
   <input type="text" id="nama" placeholder="Nama Penuh" />
   <input type="text" id="ic" placeholder="No IC" />
-  <input type="text" id="telefon" placeholder="No Telefon" />
+  <input type="text" id="phone" placeholder="No Telefon" />
   <input type="password" id="password" placeholder="Katalaluan" />
-  <button onclick="daftar()">Daftar</button>
-  <button onclick="window.location.href='index.html'">Kembali ke Log Masuk</button>
+  <button onclick="registerUser()">Daftar</button>
+  <button onclick="location.href='index.html'">Kembali ke Log Masuk</button>
 
   <script>
-    function daftar() {
-      const nama = document.getElementById("nama").value;
-      const ic = document.getElementById("ic").value;
-      const telefon = document.getElementById("telefon").value;
+    function registerUser() {
+      const nama = document.getElementById("nama").value.trim();
+      const ic = document.getElementById("ic").value.trim();
+      const phone = document.getElementById("phone").value.trim();
       const password = document.getElementById("password").value;
 
-      if (!nama || !ic || !telefon || !password) {
-        alert("Sila lengkapkan semua maklumat.");
+      if (!nama || !ic || !phone || !password) {
+        alert("Sila isi semua maklumat.");
         return;
       }
 
-      const users = JSON.parse(localStorage.getItem("users")) || [];
-      const exists = users.find(u => u.ic === ic);
-      if (exists) {
-        alert("Pengguna dengan No IC ini sudah wujud.");
+      let users = JSON.parse(localStorage.getItem("users")) || [];
+
+      if (users.find(u => u.ic === ic)) {
+        alert("No IC telah didaftarkan.");
         return;
       }
 
-      users.push({ nama, ic, telefon, password });
+      users.push({ nama, ic, phone, password });
       localStorage.setItem("users", JSON.stringify(users));
-      alert("Pendaftaran berjaya! Sila log masuk.");
+
+      alert("Pendaftaran berjaya!");
       window.location.href = "index.html";
     }
   </script>
