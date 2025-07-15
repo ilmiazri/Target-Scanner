@@ -7,33 +7,36 @@
   <style>
     body {
       margin: 0;
+      background-color: #000;
+      color: #fff;
       font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      color: #333;
     }
     header {
-      background-color: #000;
-      color: white;
+      background-color: #1a1a1a;
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      padding: 10px 20px;
-    }
-    .logo-container {
-      display: flex;
       align-items: center;
+      padding: 10px 20px;
+      border-bottom: 2px solid #ffc107;
     }
-    .logo-container img {
+    header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    header img {
       height: 50px;
-      margin-right: 10px;
+    }
+    nav {
+      display: flex;
+      gap: 10px;
     }
     nav button {
-      margin: 0 5px;
       padding: 10px 15px;
+      font-size: 14px;
       background-color: #007bff;
       color: white;
       border: none;
-      border-radius: 5px;
+      border-radius: 4px;
       cursor: pointer;
     }
     nav button:hover {
@@ -42,21 +45,23 @@
     main {
       padding: 20px;
     }
-    .performance-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
+    .performance-section {
+      background-color: #111;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 800px;
+      margin: 20px auto;
+      box-shadow: 0 0 10px rgba(255,255,255,0.1);
     }
-    h1, h2 {
-      margin: 0;
+    .performance-section h2 {
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
   <header>
-    <div class="logo-container">
-      <img src="logo.jpeg" alt="PST Logo" />
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <img src="logo.jpg" alt="PST Logo">
       <h1>Perak Shooting Team</h1>
     </div>
     <nav>
@@ -69,11 +74,10 @@
   </header>
 
   <main>
-    <div class="performance-header">
+    <div class="performance-section">
       <h2>Performance Athlete</h2>
-      <span id="athleteName">-</span>
+      <p id="athleteName"></p>
     </div>
-    <!-- Content like charts, stats, etc. can be placed here -->
   </main>
 
   <script>
@@ -86,9 +90,9 @@
       window.location.href = "index.html";
     }
 
-    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
-    if (currentUser) {
-      document.getElementById("athleteName").textContent = currentUser.nama;
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+    if (user) {
+      document.getElementById("athleteName").textContent = user.nama;
     } else {
       window.location.href = "index.html";
     }
