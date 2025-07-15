@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Target Scanner - Log Masuk</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: sans-serif;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+    }
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h2>Log Masuk</h2>
+  <input type="text" id="ic" placeholder="Masukkan No IC" />
+  <input type="password" id="password" placeholder="Katalaluan" />
+  <button onclick="login()">Log Masuk</button>
+  <button onclick="location.href='register.html'">New Profile</button>
+
+  <script>
+    function login() {
+      const ic = document.getElementById("ic").value.trim();
+      const pw = document.getElementById("password").value;
+
+      const userData = JSON.parse(localStorage.getItem("users")) || [];
+      const user = userData.find(u => u.ic === ic && u.password === pw);
+
+      if (user) {
+        // Simpan user login semasa
+        localStorage.setItem("currentUser", JSON.stringify(user));
+        window.location.href = "homepage.html"; // Updated to go to homepage
+      } else {
+        alert("Log masuk gagal. Sila cuba lagi.");
+      }
+    }
+  </script>
+</body>
+</html>
+
+  </script>
+</body>
+</html>
