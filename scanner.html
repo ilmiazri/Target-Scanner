@@ -26,6 +26,37 @@
     nav button:hover {
       background-color: #0056b3;
     }
+
+    #scanner-app {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    video {
+      width: 90%;
+      max-width: 400px;
+      border: 2px solid white;
+      margin-top: 20px;
+    }
+
+    canvas {
+      display: none;
+    }
+
+    #popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #444;
+      padding: 20px;
+      border-radius: 10px;
+      display: none;
+      color: white;
+      font-size: 18px;
+    }
   </style>
 </head>
 <body>
@@ -47,11 +78,36 @@
 
   <!-- Kandungan utama scanner -->
   <div id="scanner-app">
-    <!-- Letakkan kod fungsi scanner di sini -->
-    <p>Scanner aktif di sini...</p>
+    <button id="scanBtn">Scan</button>
+    <video id="video" autoplay muted playsinline></video>
+    <canvas id="canvas"></canvas>
+    <div id="popup">Jumlah markah: <span id="score"></span></div>
   </div>
 
   <script>
+    const scanBtn = document.getElementById('scanBtn');
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const popup = document.getElementById('popup');
+    const scoreSpan = document.getElementById('score');
+    let stream = null;
+    let scanning = false;
+
+    scanBtn.addEventListener('click', async () => {
+      if (!scanning) {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        scanning = true;
+        scanBtn.textContent = 'Tutup';
+      } else {
+        const tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
+        video.srcObject = null;
+        scanning = false;
+        scanBtn.textContent = 'Scan';
+      }
+    });
+
     function logout() {
       localStorage.removeItem("currentUser");
       window.location.href = "index.html";
