@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login - Target Scanner</title>
+  <title>Target Scanner - Log Masuk</title>
   <style>
     body {
       background: #000;
@@ -37,14 +37,19 @@
   <input type="text" id="ic" placeholder="Masukkan No IC" />
   <input type="password" id="password" placeholder="Katalaluan" />
   <button onclick="login()">Log Masuk</button>
+  <button onclick="location.href='register.html'">New Profile</button>
 
   <script>
     function login() {
-      const ic = document.getElementById("ic").value;
+      const ic = document.getElementById("ic").value.trim();
       const pw = document.getElementById("password").value;
 
-      // Tukar kepada maklumat sebenar anda
-      if (ic === "123456789012" && pw === "abc123") {
+      const userData = JSON.parse(localStorage.getItem("users")) || [];
+      const user = userData.find(u => u.ic === ic && u.password === pw);
+
+      if (user) {
+        // Simpan user login semasa
+        localStorage.setItem("currentUser", JSON.stringify(user));
         window.location.href = "scanner.html";
       } else {
         alert("Log masuk gagal. Sila cuba lagi.");
