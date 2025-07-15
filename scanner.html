@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Target Scanner</title>
+  <script async src="https://docs.opencv.org/4.5.5/opencv.js"></script>
   <style>
     body {
       margin: 0;
@@ -57,11 +58,40 @@
       color: white;
       font-size: 18px;
     }
+
+    #guideline {
+      position: absolute;
+      border: 2px dashed red;
+      width: 80%;
+      max-width: 320px;
+      aspect-ratio: 1/1;
+      top: 150px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    #recordTable {
+      margin-top: 20px;
+      border-collapse: collapse;
+      width: 90%;
+      max-width: 400px;
+    }
+
+    #recordTable th, #recordTable td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+
+    #recordTable th {
+      background-color: #333;
+    }
   </style>
 </head>
 <body>
-
-  <!-- Header dimasukkan -->
   <header style="background: #222; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
     <div style="display: flex; align-items: center;">
       <img src="images/logo.png" alt="Logo" style="height: 50px; margin-right: 10px;">
@@ -76,41 +106,132 @@
     </nav>
   </header>
 
-  <!-- Kandungan utama scanner -->
-  <div id="scanner-app">
-    <button id="scanBtn">Scan</button>
-    <video id="video" autoplay muted playsinline></video>
+  <main id="scanner-app">
+    <h2>Scanner Aktif</h2>
+    <button id="scanBtn" onclick="toggleScan()">Scan</button>
+    <div id="guideline"></div>
+    <video id="camera" autoplay playsinline></video>
     <canvas id="canvas"></canvas>
-    <div id="popup">Jumlah markah: <span id="score"></span></div>
-  </div>
+    <div id="popup">Markah: <span id="scoreValue"></span></div>
+
+    <table id="recordTable">
+      <thead>
+        <tr><th>Bil</th><th>Markah</th><th>Masa</th></tr>
+      </thead>
+      <tbody id="recordBody"></tbody>
+    </table>
+  </main>
 
   <script>
-    const scanBtn = document.getElementById('scanBtn');
-    const video = document.getElementById('video');
-    const canvas = document.getElementById('canvas');
-    const popup = document.getElementById('popup');
-    const scoreSpan = document.getElementById('score');
-    let stream = null;
-    let scanning = false;
-
-    scanBtn.addEventListener('click', async () => {
-      if (!scanning) {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
-        scanning = true;
-        scanBtn.textContent = 'Tutup';
-      } else {
-        const tracks = stream.getTracks();
-        tracks.forEach(track => track.stop());
-        video.srcObject = null;
-        scanning = false;
-        scanBtn.textContent = 'Scan';
-      }
-    });
-
     function logout() {
       localStorage.removeItem("currentUser");
       window.location.href = "index.html";
+    }
+
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+    const userName = user && user.fullName ? user.fullName : "Unknown";
+
+    const video = document.getElementById('camera');
+    const canvas = document.getElementById('canvas');
+    const popup = document.getElementById('popup');
+    const scoreValue = document.getElementById('scoreValue');
+    const guideline = document.getElementById('guideline');
+    const recordBody = document.getElementById('recordBody');
+
+    let streamStarted = false;
+    let scanning = false;
+    let intervalId = null;
+    let stream = null;
+    let scanCount = 1;
+
+    async function toggleScan() {
+      if (!scanning) {
+        await startCamera();
+        document.getElementById("scanBtn").textContent = "Stop Scan";
+        guideline.style.display = "block";
+        intervalId = setInterval(scanWithOpenCV, 6000);
+        scanning = true;
+      } else {
+        stopCamera();
+        document.getElementById("scanBtn").textContent = "Scan";
+        guideline.style.display = "none";
+        clearInterval(intervalId);
+        scanning = false;
+      }
+    }
+
+    async function startCamera() {
+      if (!streamStarted) {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+        streamStarted = true;
+      }
+    }
+
+    function stopCamera() {
+      if (stream) {
+        const tracks = stream.getTracks();
+        tracks.forEach(track => track.stop());
+        video.srcObject = null;
+        streamStarted = false;
+      }
+    }
+
+    function getDistance(x1, y1, x2, y2) {
+      return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+    }
+
+    function scanWithOpenCV() {
+      const ctx = canvas.getContext('2d');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const src = cv.imread(canvas);
+      const gray = new cv.Mat();
+      const thresh = new cv.Mat();
+      cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+      cv.threshold(gray, thresh, 100, 255, cv.THRESH_BINARY_INV);
+
+      let contours = new cv.MatVector();
+      let hierarchy = new cv.Mat();
+      cv.findContours(thresh, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const maxDistance = Math.sqrt(centerX ** 2 + centerY ** 2);
+
+      let totalScore = 0;
+
+      for (let i = 0; i < contours.size(); i++) {
+        const cnt = contours.get(i);
+        const area = cv.contourArea(cnt);
+        if (area > 100 && area < 2000) {
+          const moments = cv.moments(cnt);
+          const cx = moments.m10 / moments.m00;
+          const cy = moments.m01 / moments.m00;
+          const distance = getDistance(centerX, centerY, cx, cy);
+          const score = Math.max(0, 10 - (distance / maxDistance) * 10);
+          totalScore += score;
+        }
+      }
+
+      src.delete(); gray.delete(); thresh.delete(); contours.delete(); hierarchy.delete();
+
+      const finalScore = Math.round(totalScore);
+      scoreValue.textContent = finalScore;
+      popup.style.display = 'block';
+      setTimeout(() => popup.style.display = 'none', 2000);
+
+      const now = new Date().toLocaleString();
+      const row = document.createElement('tr');
+      row.innerHTML = `<td>${scanCount++}</td><td>${finalScore}</td><td>${now}</td>`;
+      recordBody.prepend(row);
+
+      // Simpan ke database (localStorage sebagai contoh sementara)
+      const existing = JSON.parse(localStorage.getItem("scoreRecords") || "[]");
+      existing.push({ name: userName, score: finalScore, time: now });
+      localStorage.setItem("scoreRecords", JSON.stringify(existing));
     }
   </script>
 </body>
