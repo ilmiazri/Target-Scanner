@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homepage - Perak Shooting Team</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+    header {
+      background-color: #000;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+    }
+    .logo-container img {
+      height: 50px;
+      margin-right: 10px;
+    }
+    nav button {
+      margin: 0 5px;
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    nav button:hover {
+      background-color: #0056b3;
+    }
+    main {
+      padding: 20px;
+    }
+    .performance-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    h1, h2 {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <img src="logo.jpeg" alt="PST Logo" />
+      <h1>Perak Shooting Team</h1>
+    </div>
+    <nav>
+      <button onclick="goTo('homepage.html')">Home</button>
+      <button onclick="goTo('scanner.html')">Scan</button>
+      <button onclick="goTo('profile.html')">Profile</button>
+      <button onclick="goTo('data.html')">Data</button>
+      <button onclick="logout()">Log Out</button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="performance-header">
+      <h2>Performance Athlete</h2>
+      <span id="athleteName">-</span>
+    </div>
+    <!-- Content like charts, stats, etc. can be placed here -->
+  </main>
+
+  <script>
+    function goTo(page) {
+      window.location.href = page;
+    }
+
+    function logout() {
+      localStorage.removeItem("currentUser");
+      window.location.href = "index.html";
+    }
+
+    const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+    if (currentUser) {
+      document.getElementById("athleteName").textContent = currentUser.nama;
+    } else {
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>
