@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Target Scanner</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f1f1f1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    .login-container {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      width: 300px;
+    }
+    .login-container h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #007bff;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .error {
+      color: red;
+      font-size: 14px;
+      text-align: center;
+      display: none;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Login</h2>
+    <input type="text" id="ic" placeholder="No IC">
+    <input type="password" id="password" placeholder="Kata Laluan">
+    <button onclick="login()">Log Masuk</button>
+    <div id="loginError" class="error">IC atau kata laluan salah</div>
+  </div>
+
+  <script>
+    const defaultUsers = [
+      { ic: "900101014321", password: "1234" },
+      { ic: "800202028765", password: "abcd" }
+    ];
+
+    // If no users stored, store default
+    if (!localStorage.getItem("scannerUsers")) {
+      localStorage.setItem("scannerUsers", JSON.stringify(defaultUsers));
+    }
+
+    function login() {
+      const ic = document.getElementById('ic').value.trim();
+      const password = document.getElementById('password').value.trim();
+      const error = document.getElementById('loginError');
+      const users = JSON.parse(localStorage.getItem("scannerUsers"));
+
+      const user = users.find(u => u.ic === ic && u.password === password);
+      if (user) {
+        localStorage.setItem("loggedInUser", JSON.stringify(user));
+        window.location.href = "scanner.html";
+      } else {
+        error.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>
