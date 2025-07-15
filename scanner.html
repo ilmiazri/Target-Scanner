@@ -1,168 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Target Scanner</title>
   <style>
     body {
       margin: 0;
-      font-family: sans-serif;
       background: #000;
       color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      height: 100vh;
-      overflow: hidden;
+      font-family: sans-serif;
     }
-    #videoWrapper {
-      position: relative;
-      width: 85vw;
-      max-width: 600px;
-      height: 85vw;
-      max-height: 600px;
-      margin-top: 20px;
-    }
-    video {
-      width: 100%;
-      height: 100%;
-      border-radius: 10px;
-    }
-    #scanFrame {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: 5px dashed white;
-      border-radius: 10px;
-      display: none;
-      pointer-events: none;
-    }
-    button {
-      margin: 15px;
-      padding: 10px 20px;
-      font-size: 16px;
+
+    nav button {
+      margin: 0 5px;
+      padding: 8px 12px;
+      font-size: 14px;
+      background-color: #007bff;
       border: none;
-      border-radius: 5px;
-      background: #007bff;
+      border-radius: 4px;
       color: white;
       cursor: pointer;
     }
-    button:hover {
-      background: #0056b3;
-    }
-    table {
-      width: 90%;
-      margin-top: 20px;
-      border-collapse: collapse;
-      background: #222;
-    }
-    table, th, td {
-      border: 1px solid #555;
-    }
-    th, td {
-      padding: 8px;
-      text-align: center;
-    }
-    #scorePopup {
-      position: absolute;
-      top: 10px;
-      background: rgba(0, 0, 0, 0.8);
-      color: white;
-      padding: 10px 20px;
-      border-radius: 5px;
-      display: none;
-      font-size: 24px;
+
+    nav button:hover {
+      background-color: #0056b3;
     }
   </style>
 </head>
 <body>
-  <h2>Target Scanner</h2>
-  <div id="videoWrapper">
-    <video id="video" autoplay playsinline></video>
-    <div id="scanFrame"></div>
-    <div id="scorePopup">Markah: 10</div>
+
+  <!-- Header yang dimasukkan -->
+  <header style="background: #222; padding: 10px; display: flex; justify-content: space-between; align-items: center;">
+    <div style="display: flex; align-items: center;">
+      <img src="images/logo.png" alt="Logo" style="height: 50px; margin-right: 10px;">
+      <h1 style="color: white;">Perak Shooting Team</h1>
+    </div>
+    <nav>
+      <button onclick="location.href='homepage.html'">Home</button>
+      <button onclick="location.href='scanner.html'">Scan</button>
+      <button onclick="location.href='profile.html'">Profile</button>
+      <button onclick="location.href='data.html'">Data</button>
+      <button onclick="logout()">Log Out</button>
+    </nav>
+  </header>
+
+  <!-- Kandungan scanner asal anda bermula di sini -->
+  <div id="scanner-app">
+    <!-- ... -->
   </div>
-  <button id="scanBtn">Scan</button>
-  <button id="resetBtn">Reset</button>
-  <table id="scoreTable">
-    <tr><th>Bil</th><th>Markah</th></tr>
-  </table>
 
   <script>
-    let scanning = false;
-    const scanBtn = document.getElementById("scanBtn");
-    const video = document.getElementById("video");
-    const scanFrame = document.getElementById("scanFrame");
-    const scoreTable = document.getElementById("scoreTable");
-    const scorePopup = document.getElementById("scorePopup");
-    const resetBtn = document.getElementById("resetBtn");
-
-    let scores = [];
-
-    async function toggleCamera() {
-      if (scanning) {
-        stopCamera();
-        scanFrame.style.display = "none";
-        scanBtn.textContent = "Scan";
-        scanning = false;
-      } else {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-          video.srcObject = stream;
-          scanFrame.style.display = "block";
-          scanBtn.textContent = "Stop";
-          scanning = true;
-          detectScore();
-        } catch (err) {
-          alert("Camera not available");
-        }
-      }
+    function logout() {
+      localStorage.removeItem("currentUser");
+      window.location.href = "index.html";
     }
-
-    function stopCamera() {
-      const stream = video.srcObject;
-      if (stream) {
-        const tracks = stream.getTracks();
-        tracks.forEach(track => track.stop());
-        video.srcObject = null;
-      }
-    }
-
-    function detectScore() {
-      // Simulasi pengesanan markah
-      setTimeout(() => {
-        if (scanning) {
-          const score = Math.floor(Math.random() * 11); // markah rawak 0–10
-          scores.push(score);
-          showScorePopup(score);
-          updateTable();
-          detectScore();
-        }
-      }, 3000);
-    }
-
-    function showScorePopup(score) {
-      scorePopup.textContent = `Markah: ${score}`;
-      scorePopup.style.display = "block";
-      setTimeout(() => {
-        scorePopup.style.display = "none";
-      }, 2000);
-    }
-
-    function updateTable() {
-      const rows = scores.map((s, i) => `<tr><td>${i + 1}</td><td>${s}</td></tr>`).join("");
-      scoreTable.innerHTML = `<tr><th>Bil</th><th>Markah</th></tr>${rows}`;
-    }
-
-    scanBtn.addEventListener("click", toggleCamera);
-    resetBtn.addEventListener("click", () => {
-      scores = [];
-      updateTable();
-    });
   </script>
 </body>
 </html>
