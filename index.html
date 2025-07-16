@@ -1,19 +1,106 @@
-function login() {
-  const ic = document.getElementById("ic").value.trim();
-  const pw = document.getElementById("password").value;
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Perak Shooting Team - Log Masuk</title>
+  <style>
+    body { 
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background: linear-gradient(to bottom, white, yellow, black);
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
 
-  if (!ic || !pw) {
-    alert("Sila isi semua maklumat.");
-    return;
-  }
+    .container {
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      text-align: center;
+      width: 90%;
+      max-width: 400px;
+    }
 
-  const userData = JSON.parse(localStorage.getItem("users")) || [];
-  const user = userData.find(u => u.ic === ic && u.password === pw);
+    .logo {
+      width: 120px;
+      height: auto;
+      margin-bottom: 15px;
+    }
 
-  if (user) {
-    localStorage.setItem("currentUser", JSON.stringify(user));
-    window.location.href = "homepage.html";
-  } else {
-    alert("Log masuk gagal. Sila cuba lagi.");
-  }
-}
+    h2 {
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+    }
+
+    input {
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .link-button {
+      background: none;
+      color: #ffc107;
+      text-decoration: underline;
+      cursor: pointer;
+      border: none;
+      padding: 0;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Letakkan fail imej 'PST.jpeg' di root projek atau sesuaikan laluan jika dalam folder -->
+    <img src="PST.jpeg" alt="Logo Pasukan" class="logo" />
+
+    <h2>Log Masuk</h2>
+    <input type="text" id="ic" placeholder="Masukkan No IC" />
+    <input type="password" id="password" placeholder="Katalaluan" />
+    <button onclick="login()">Log Masuk</button>
+    <button onclick="location.href='register.html'">Profil Baru</button>
+    <button class="link-button" onclick="location.href='reset-password.html'">Lupa Katalaluan?</button>
+  </div>
+
+  <script>
+    function login() {
+      const ic = document.getElementById("ic").value.trim();
+      const pw = document.getElementById("password").value;
+
+      const userData = JSON.parse(localStorage.getItem("users")) || [];
+      const user = userData.find(u => u.ic === ic && u.password === pw);
+
+      if (user) {
+        localStorage.setItem("currentUser", JSON.stringify(user));
+        window.location.href = "homepage.html";
+      } else {
+        alert("Log masuk gagal. Sila cuba lagi.");
+      }
+    }
+  </script>
+</body>
+</html>
